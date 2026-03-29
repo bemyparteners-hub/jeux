@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AURORA RUSH</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <canvas id="gameCanvas" aria-label="Aurora Rush"></canvas>
+
+    <div class="hud top-bar">
+      <button id="pauseButton" class="hud-button" aria-label="Pause">II</button>
+      <div class="hud-cluster score-cluster">
+        <div class="hud-card">
+          <span class="hud-label">Score</span>
+          <strong id="scoreValue">0</strong>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">Distance</span>
+          <strong id="distanceValue">0 m</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud right-bar">
+      <div class="hud-card emphasis">
+        <span class="hud-label">Multiplicateur</span>
+        <strong id="multiplierValue">x1</strong>
+      </div>
+      <div class="hud-card">
+        <span class="hud-label">Pièces</span>
+        <strong id="coinValue">0</strong>
+      </div>
+      <div class="hud-card">
+        <span class="hud-label">Meilleur score</span>
+        <strong id="bestValue">0</strong>
+      </div>
+    </div>
+
+    <div class="hud mission-bar">
+      <div class="mission-card">
+        <span class="hud-label">Mission</span>
+        <strong id="missionTitle">Collecter 40 pièces</strong>
+        <span id="missionProgress">0 / 40</span>
+      </div>
+      <div id="powerupTray" class="powerup-tray"></div>
+    </div>
+
+    <div class="hud bottom-bar">
+      <div class="controls-hint">Swipe pour esquiver • Haut pour sauter • Bas pour glisser</div>
+      <div id="comboNotice" class="combo-notice"></div>
+    </div>
+
+    <div id="startOverlay" class="overlay visible">
+      <div class="overlay-card">
+        <p class="eyebrow">Runner mobile original</p>
+        <h1>AURORA RUSH</h1>
+        <p class="lead">
+          Dévalez les rails de Solara Junction, esquivez les trains, alignez les couloirs de pièces
+          et maintenez votre flow le plus longtemps possible.
+        </p>
+        <div class="feature-grid">
+          <div class="feature-pill">3 voies lisibles</div>
+          <div class="feature-pill">Swipe mobile ultra réactif</div>
+          <div class="feature-pill">Saut, glissade, near miss</div>
+          <div class="feature-pill">Pièces, bouclier, aimant, score x2</div>
+        </div>
+        <button id="startButton" class="primary-button">Lancer une run</button>
+      </div>
+    </div>
+
+    <div id="pauseOverlay" class="overlay">
+      <div class="overlay-card compact">
+        <p class="eyebrow">Pause</p>
+        <h2>Souffle un instant</h2>
+        <p class="lead">La ville t'attend encore. Repars quand tu veux.</p>
+        <button id="resumeButton" class="primary-button">Reprendre</button>
+      </div>
+    </div>
+
+    <div id="gameOverOverlay" class="overlay">
+      <div class="overlay-card">
+        <p class="eyebrow">Fin de run</p>
+        <h2 id="gameOverTitle">Encore un essai ?</h2>
+        <p id="gameOverSummary" class="lead">0 points • 0 mètres • 0 pièces</p>
+        <div class="results-grid">
+          <div class="feature-pill">Near miss: <span id="resultNearMisses">0</span></div>
+          <div class="feature-pill">Pièces: <span id="resultCoins">0</span></div>
+          <div class="feature-pill">Multiplicateur max: <span id="resultMultiplier">x1</span></div>
+          <div class="feature-pill">Mission: <span id="resultMission">0%</span></div>
+        </div>
+        <div class="button-row">
+          <button id="restartButton" class="primary-button">Relancer</button>
+          <button id="menuButton" class="secondary-button">Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
