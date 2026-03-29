@@ -355,21 +355,15 @@ function addSegment(zStart) {
     scenery: createScenery(zStart),
   };
 
-  if (roll < 0.3) {
+  if (roll < 0.38) {
     segment.type = "coins";
     populateCoinRibbon(segment);
-  } else if (roll < 0.48) {
-    segment.type = "switch";
-    populateSwitchPattern(segment, difficulty);
-  } else if (roll < 0.62) {
+  } else if (roll < 0.68) {
     segment.type = "jump";
     populateJumpPattern(segment, difficulty);
-  } else if (roll < 0.74) {
+  } else if (roll < 0.9) {
     segment.type = "slide";
     populateSlidePattern(segment, difficulty);
-  } else if (roll < 0.86) {
-    segment.type = "train";
-    populateTrainPattern(segment, difficulty);
   } else {
     segment.type = "combo";
     populateComboPattern(segment, difficulty);
@@ -396,17 +390,6 @@ function populateCoinRibbon(segment) {
   }
 }
 
-function populateSwitchPattern(segment, difficulty) {
-  const blockedLane = (Math.random() * 3) | 0;
-  segment.obstacles.push(createObstacle("signal", blockedLane, segment.z + 8, "switch"));
-  addCoinsLane(segment, blockedLane === 0 ? 2 : 0, segment.z + 4, 5);
-
-  if (difficulty > 3 && Math.random() < 0.28) {
-    const secondLane = blockedLane === 1 ? 2 : 1;
-    segment.obstacles.push(createObstacle("crate", secondLane, segment.z + 13, "switch"));
-  }
-}
-
 function populateJumpPattern(segment, difficulty) {
   const lane = (Math.random() * 3) | 0;
   segment.obstacles.push(createObstacle("barrierLow", lane, segment.z + 9, "jump"));
@@ -424,34 +407,19 @@ function populateSlidePattern(segment, difficulty) {
   segment.obstacles.push(createObstacle("barrierHigh", lane, segment.z + 9, "slide"));
   addCoinsLane(segment, lane, segment.z + 5, 4, 0.38);
 
-  if (difficulty > 3 && Math.random() < 0.22) {
-    const blockedLane = lane === 2 ? 0 : 2;
-    segment.obstacles.push(createObstacle("signal", blockedLane, segment.z + 13, "switch"));
-  }
-}
-
-function populateTrainPattern(segment, difficulty) {
-  const lane = (Math.random() * 3) | 0;
-  const length = difficulty > 2 ? 8.4 : 6.8;
-  segment.obstacles.push(createObstacle("train", lane, segment.z + 10, "switch", length));
-  addCoinsLane(segment, lane === 0 ? 1 : 0, segment.z + 4, 5);
-
-  if (difficulty > 4 && Math.random() < 0.28) {
-    const secondLane = lane === 2 ? 1 : 2;
+  if (difficulty > 4 && Math.random() < 0.18) {
+    const secondLane = lane === 1 ? 2 : 1;
     segment.obstacles.push(createObstacle("barrierLow", secondLane, segment.z + 14, "jump"));
   }
 }
 
 function populateComboPattern(segment, difficulty) {
   const baseLane = (Math.random() * 3) | 0;
-  segment.obstacles.push(createObstacle("signal", baseLane, segment.z + 7, "switch"));
+  segment.obstacles.push(createObstacle("barrierLow", baseLane, segment.z + 8, "jump"));
   if (difficulty > 2) {
-    segment.obstacles.push(createObstacle("barrierLow", (baseLane + 1) % 3, segment.z + 11.5, "jump"));
+    segment.obstacles.push(createObstacle("barrierHigh", (baseLane + 1) % 3, segment.z + 14.5, "slide"));
   }
-  if (difficulty > 4) {
-    segment.obstacles.push(createObstacle("barrierHigh", baseLane === 0 ? 2 : 0, segment.z + 14.5, "slide"));
-  }
-  addCoinsLane(segment, 1, segment.z + 3, 7);
+  addCoinsLane(segment, baseLane === 1 ? 2 : 1, segment.z + 4, 6);
 }
 
 function createScenery(zStart) {
@@ -498,9 +466,6 @@ function createObstacle(kind, lane, z, action, length = 2.6) {
   const definitions = {
     barrierLow: { width: 0.86, height: 0.7, length: 0.6, color: palette.obstacle, action },
     barrierHigh: { width: 0.86, height: 1.5, length: 0.5, color: palette.signalWhite, action },
-    signal: { width: 0.42, height: 1.8, length: 0.42, color: palette.signalRed, action },
-    crate: { width: 0.74, height: 0.95, length: 0.8, color: "#d87939", action },
-    train: { width: 1.12, height: 1.9, length, color: palette.trainBody, action },
   };
 
   return {
@@ -614,14 +579,6 @@ function evaluateObstacle(obstacle) {
   if (obstacle.action === "slide" && isSliding) {
     avoided = true;
   }
-  if (obstacle.action === "switch" && player.lane !== obstacle.lane && Math.abs(player.laneOffset - laneToWorld(obstacle.lane)) > 0.45) {
-    avoided = true;
-  }
-
-  if (obstacle.kind === "train" && player.dash > 0) {
-    avoided = true;
-  }
-
   if (avoided) {
     obstacle.passed = true;
     return;
@@ -1014,7 +971,7 @@ function drawObstacle(obstacle) {
 
   if (obstacle.z > 0) {
     ctx.globalAlpha = 0.16 * telegraphAlpha;
-    ctx.fillStyle = obstacle.kind === "train" ? palette.signalRed : "#ffffff";
+    ctx.fillStyle = "#ffffff";
     roundRect(p.x - width * 0.78, baseY - 6, width * 1.56, 10, 8);
     ctx.fill();
 
@@ -1028,41 +985,7 @@ function drawObstacle(obstacle) {
     ctx.globalAlpha = 1;
   }
 
-  if (obstacle.kind === "train") {
-    ctx.fillStyle = obstacle.color;
-    roundRect(p.x - width * 0.88, baseY - height, width * 1.76, height, 12);
-    ctx.fill();
-    ctx.fillStyle = palette.trainStripe;
-    roundRect(p.x - width * 0.88, baseY - height * 0.72, width * 1.76, height * 0.18, 8);
-    ctx.fill();
-    ctx.fillStyle = "#88b7ff";
-    roundRect(p.x - width * 0.7, baseY - height * 0.85, width * 1.4, height * 0.28, 8);
-    ctx.fill();
-    ctx.fillStyle = "rgba(0,0,0,0.16)";
-    ctx.fillRect(p.x - width * 0.88, baseY, width * 1.76, length * 0.24);
-    ctx.strokeStyle = palette.signalRed;
-    ctx.lineWidth = Math.max(2, p.scale * 7);
-    ctx.beginPath();
-    ctx.moveTo(p.x - width * 0.7, baseY - height * 0.45);
-    ctx.lineTo(p.x + width * 0.7, baseY - height * 0.45);
-    ctx.stroke();
-    return;
-  }
-
   ctx.fillStyle = obstacle.color;
-  if (obstacle.kind === "signal") {
-    ctx.fillRect(p.x - width * 0.25, baseY - height, width * 0.5, height);
-    ctx.fillStyle = palette.signalWhite;
-    ctx.beginPath();
-    ctx.arc(p.x, baseY - height + width * 0.7, width * 0.42, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = palette.signalRed;
-    ctx.beginPath();
-    ctx.arc(p.x, baseY - height + width * 0.7, width * 0.22, 0, Math.PI * 2);
-    ctx.fill();
-    return;
-  }
-
   roundRect(p.x - width / 2, baseY - height, width, height, 10);
   ctx.fill();
   ctx.strokeStyle = obstacle.kind === "barrierHigh" ? palette.signalRed : "rgba(0,0,0,0.22)";
@@ -1080,17 +1003,13 @@ function drawObstacle(obstacle) {
     ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.fillRect(p.x - width / 2, baseY - height * 0.52, width, height * 0.08);
   }
-  if (obstacle.kind === "crate") {
-    ctx.fillStyle = "rgba(255,255,255,0.36)";
-    ctx.fillRect(p.x - width * 0.32, baseY - height * 0.78, width * 0.64, height * 0.1);
-  }
 }
 
 function drawPlayer() {
   const bounce = Math.sin(state.player.animationTime * 8) * 4 * (state.player.y <= 0.01 ? 1 : 0.35);
-  const laneShift = state.player.laneOffset * viewport.width * 0.08;
-  const baseX = viewport.width / 2 + laneShift;
-  const baseY = viewport.height * 0.82 - state.player.y * 92 - state.player.justLanded * 8 + bounce;
+  const anchor = projectPoint(state.player.laneOffset, 0, 1.15);
+  const baseX = anchor.x;
+  const baseY = anchor.y + 78 - state.player.y * 92 - state.player.justLanded * 8 + bounce;
   const slide = state.player.slideTimer > 0.12 ? 1 : 0;
   const bodyTilt = (state.player.targetLane - 1 - state.player.laneOffset / laneSpacing) * 0.15;
 
