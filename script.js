@@ -1007,9 +1007,9 @@ function drawObstacle(obstacle) {
 
 function drawPlayer() {
   const bounce = Math.sin(state.player.animationTime * 8) * 4 * (state.player.y <= 0.01 ? 1 : 0.35);
-  const anchor = projectPoint(state.player.laneOffset, 0, 1.15);
+  const anchor = projectPoint(state.player.laneOffset, 0, 8);
   const baseX = anchor.x;
-  const baseY = anchor.y + 78 - state.player.y * 92 - state.player.justLanded * 8 + bounce;
+  const baseY = viewport.height * 0.8 - state.player.y * 92 - state.player.justLanded * 8 + bounce;
   const slide = state.player.slideTimer > 0.12 ? 1 : 0;
   const bodyTilt = (state.player.targetLane - 1 - state.player.laneOffset / laneSpacing) * 0.15;
 
